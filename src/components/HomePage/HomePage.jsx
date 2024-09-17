@@ -1,8 +1,9 @@
 import React from "react";
 
 import iphone from "../../assets/iphone-14-pro.webp";
-import mac from "../../assests/mac-system-cut.jfif";
+import mac from "../../assets/mac-system-cut.jfif";
 import HeroSection from "./HeroSection";
+import FeaturedProducts from "./FeaturedProducts";
 
 const HomePage = () => {
 	return (
@@ -13,7 +14,7 @@ const HomePage = () => {
 				link="/"
 				image={iphone}
 			/>
-			{/* Featured Products */}
+			<FeaturedProducts />
 			<HeroSection
 				title="Built the ultimate setup"
 				subtitle="You can add Studio Display and colour-matched Magic accessories to your bag after configure your Mac mini."
@@ -23,3 +24,5 @@ const HomePage = () => {
 		</div>
 	);
 };
+
+export default HomePage;
