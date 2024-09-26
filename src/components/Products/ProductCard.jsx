@@ -1,28 +1,29 @@
 import React from "react";
 
 import "./ProductCard.css";
-import iphone from "../../assets/iphone.jpg";
+
 import star from "../../assets/white-star.png";
 import basket from "../../assets/basket.png";
+import { NavLink } from "react-router-dom";
 
-const ProductCard = () => {
+const ProductCard = ({ id, image, price, title, rating, ratingCounts, stock }) => {
 	return (
 		<article className="product_card">
 			<div className="product_image">
-				<a href="product/1">
-					<img src={iphone} alt="product image" />
-				</a>
+				<NavLink to={`product/${id}`}>
+					<img src={image} alt="product image" />
+				</NavLink>
 			</div>
 			<div className="product_details">
-				<h3 className="product_price">$999</h3>
-				<p className="product_title">iPhone 20 PRO</p>
+				<h3 className="product_price">${price}</h3>
+				<p className="product_title">{title}</p>
 				<footer className="align_center product_info_footer">
 					<div className="align_center">
 						<p className="align_center product_rating">
 							<img src={star} alt="star" />
-							5.0
+							{rating}
 						</p>
-						<p className="product_review_count">120</p>
+						<p className="product_review_count">{ratingCounts}</p>
 					</div>
 					<button className="add_to_cart">
 						<img src={basket} alt="basket button" />
