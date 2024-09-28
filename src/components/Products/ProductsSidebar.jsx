@@ -12,7 +12,9 @@ const ProductsSidebar = () => {
 			<div className="category_links">
 				{error && <em className="form_error">{error}</em>}
 				{categories &&
-					categories.map((category) => <LinkWithIcon title={category.toUpperCase()} link={`/category/${category}`} sidebar={true} />)}
+					categories.map((category) => (
+						<LinkWithIcon title={category.toUpperCase()} link={`/products/category/${category}`} sidebar={true} />
+					))}
 			</div>
 		</aside>
 	);

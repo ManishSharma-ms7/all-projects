@@ -3,10 +3,18 @@ import React from "react";
 import "./ProductsList.css";
 import ProductCard from "./ProductCard";
 import useData from "../../hooks/useData";
+import { useParams } from "react-router-dom";
 import ProductCardSkeleton from "./ProductCardSkeleton";
 
 const ProductsList = () => {
-	const { data: products, error, isLoading } = useData("/products");
+	const { category } = useParams();
+
+	let url = "/products";
+	if (category) {
+		url = `/products/category/${category}`;
+	}
+
+	const { data: products, error, isLoading } = useData(url, category ? [category] : []);
 	const skeletons = [1, 2, 3, 4, 5, 6, 7, 8];
 
 	return (
