@@ -1,22 +1,13 @@
-import React, { useEffect, useState } from "react";
-import apiClient from "../../utils/api-client";
+import React from "react";
 
 import "./ProductsList.css";
 import ProductCard from "./ProductCard";
+import useData from "../../hooks/useData";
+import ProductCardSkeleton from "./ProductCardSkeleton";
 
 const ProductsList = () => {
-	const [products, setProducts] = useState([]);
-	const [error, setError] = useState("");
-
-	useEffect(() => {
-		apiClient
-			.get("/products")
-			.then((res) => {
-				console.log(res);
-				setProducts(res["data"]);
-			})
-			.catch((err) => setError(err.message));
-	}, []);
+	const { data: products, error, isLoading } = useData("/products");
+	const skeletons = [1, 2, 3, 4, 5, 6, 7, 8];
 
 	return (
 		<section className="products_list_section">
@@ -33,17 +24,19 @@ const ProductsList = () => {
 
 			<div className="products_list">
 				{error && <em className="form_error">{error}</em>}
-				{products.map((product) => (
-					<ProductCard
-						key={product.id}
-						id={product.id}
-						title={product.title}
-						price={product.price}
-						image={product.image}
-						rating={product.rating.rate}
-						ratingCount={product.rating.count}
-					/>
-				))}
+				{isLoading && skeletons.map((n) => <ProductCardSkeleton key={n} />)}
+				{products &&
+					products.map((product) => (
+						<ProductCard
+							key={product.id}
+							id={product.id}
+							title={product.title}
+							price={product.price}
+							image={product.image}
+							rating={product.rating.rate}
+							ratingCount={product.rating.count}
+						/>
+					))}
 			</div>
 		</section>
 	);
