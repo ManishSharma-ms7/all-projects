@@ -10,7 +10,7 @@ exports.userVerification = catchAsync(async (req, res, next) => {
 	if (authorization && authorization.startsWith("Bearer")) {
 		token = authorization.split(" ")[1];
 		const decoded = verify(token);
-		const user = User.findById(decoded._id).select("-password");
+		const user = await User.findById(decoded.id).select("-password");
 		if (user) {
 			req.user = user;
 		} else {

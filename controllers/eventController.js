@@ -2,7 +2,7 @@ const Event = require("../models/eventModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
 const helper = require("./../helper/helper");
-const validator = require("validator");
+const sendmail = require("./../utils/mailer");
 
 const validateReq = function (req, res, next) {
 	if (!req.body?.name) {
@@ -52,7 +52,7 @@ exports.saveEvents = catchAsync(async (req, res, next) => {
 	if (!capacity) {
 		return next(new AppError("incorrect capacity value.", 400));
 	}
-	if (!published || !["true", "false"].includes(published.toLowerCase())) {
+	if (typeof published !== "boolean") {
 		return next(new AppError("incorrect published value.", 400));
 	}
 
@@ -73,30 +73,38 @@ exports.saveEvents = catchAsync(async (req, res, next) => {
 });
 
 exports.updateEvents = catchAsync(async (req, res, next) => {
-	const { id } = req.body;
+	const { name, event_start_date, event_end_date, description, capacity, speaker, audience, published } = req.body;
+	let id = req.params.id;
 	if (!id) {
 		return next(new AppError("please provide event id.", 404));
 	}
-	if (req.user.isOrganizer === false) {
-		return next(new AppError("only organizer can update details of event.", 400));
+	if (
+		req.user.isSpeaker &&
+		!req.user.isOrganizer &&
+		(name || event_start_date || event_end_date || description || capacity || audience || published)
+	) {
+		return next(new AppError("Organizer can only update event details like name, capacity", 400));
+	}
+	if (!req.user.isSpeaker && !req.user.isOrganizer) {
+		return next(new AppError("The user is not authorized to perform this action.", 400));
 	}
 
 	let update = {};
 	let filter = { _id: id };
 
 	for (let key in req.body) {
-		if (req.body?.key) {
-			update[key] = req.body.key;
+		if (req.body[key]) {
+			update[key] = req.body[key];
 		}
 	}
 
-	let event = await Event.findOneAndUpdate(filter, update);
+	let event = await Event.findOneAndUpdate(filter, update, { new: true });
 	res.status(201).json({ success: true, message: "event details updated.", event });
 	next();
 });
 
 exports.deleteEvents = catchAsync(async (req, res, next) => {
-	const { id } = req.body;
+	let id = req.params.id;
 	if (!id) {
 		return next(new AppError("please provide event id.", 404));
 	}
