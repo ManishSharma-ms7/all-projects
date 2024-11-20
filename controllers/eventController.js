@@ -2,21 +2,7 @@ const Event = require("../models/eventModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
 const helper = require("./../helper/helper");
-const sendmail = require("./../utils/mailer");
-
-const validateReq = function (req, res, next) {
-	if (!req.body?.name) {
-		return next(new AppError("Name is required to create a event", 404));
-	}
-	if (!req.body?.organizer || !Array.isArray(req.body.organizer)) {
-		return next(new AppError("organizer is a required.", 404));
-	}
-
-	if (!req.body?.description || typeof req.body.description !== "string") {
-		return next(new AppError("description is a required.", 404));
-	}
-	return true;
-};
+const { sendMail } = require("./../utils/mailer");
 
 exports.getEvents = catchAsync(async (req, res, next) => {
 	const event = await Event.find();
@@ -117,4 +103,26 @@ exports.deleteEvents = catchAsync(async (req, res, next) => {
 	res.status(204).json({ success: true, message: "event deleted." });
 });
 
-exports.register = catchAsync(async (req, res, next) => {});
+exports.register = catchAsync(async (req, res, next) => {
+	const { email } = req.body;
+	let id = req.params.id;
+	if (!id) {
+		return next(new AppError("please provide event id.", 404));
+	}
+	if (typeof email !== "string") {
+		return next(new AppError("Incorrect value.", 404));
+	}
+
+	let event = await Event.findById(id);
+	if (event.capacity < event.audience.length + 1) {
+		return next(new AppError("Capacity for the event is full. No more registration will be taken forward.", 404));
+	}
+	event.audience.push(email);
+	event.save();
+
+	text = `Hi User, you have successfully registered for the event ${event.name}-${event.description}. The event will held on ${event.event_start_date} till ${event.event_end_date}. You will get reminder mail for joining.`;
+
+	sendMail(event.name, text, "", email);
+	res.status(201).json({ success: true, message: "User is registered in the event. You will receive email with event details." });
+	next();
+});

@@ -1,7 +1,7 @@
 const nodemailer = require("nodemailer");
 
 // async..await is not allowed in global scope, must use a wrapper
-const sendMail = async function (subject, text, html, to) {
+exports.sendMail = async function (subject, text, html, to) {
 	const transporter = nodemailer.createTransport({
 		service: "gmail",
 		host: "smtp.gmail.email",
@@ -28,4 +28,5 @@ const sendMail = async function (subject, text, html, to) {
 	return info;
 };
 
-// sendMail("Online Event", "Hello I am Manish Sharma", "<html>Text in Here</html>", ["ms7.sharma1298@gmail.com"]);
+// response = sendMail("Online Event", "Hello I am Manish Sharma", "<html>Text in Here</html>", ["ms7.sharma1298@gmail.com"]);
+// console.log(response.then((resp)=>{console.log(resp)}));
