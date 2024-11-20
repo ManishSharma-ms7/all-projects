@@ -117,6 +117,10 @@ exports.register = catchAsync(async (req, res, next) => {
 	if (event.capacity < event.audience.length + 1) {
 		return next(new AppError("Capacity for the event is full. No more registration will be taken forward.", 404));
 	}
+
+	if (event.audience.includes(email)) {
+		return next(new AppError("User already registered.", 404));
+	}
 	event.audience.push(email);
 	event.save();
 
